@@ -1,0 +1,57 @@
+{
+  "name": "filter-scan-dir",
+  "version": "0.0.1",
+  "description": "Recursively scan directory for a flat array of files",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "clap check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jchip/filter-scan-dir.git"
+  },
+  "files": [
+    "lib"
+  ],
+  "keywords": [
+    "util",
+    "recursive",
+    "scan",
+    "walk",
+    "dir",
+    "directory",
+    "readdir",
+    "fs"
+  ],
+  "author": "Joel Chen <joel123@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/jchip/filter-scan-dir/issues"
+  },
+  "homepage": "https://github.com/jchip/filter-scan-dir",
+  "dependencies": {},
+  "devDependencies": {
+    "electrode-archetype-njs-module-dev": "^3.0.0"
+  },
+  "nyc": {
+    "all": true,
+    "reporter": [
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "exclude": [
+      "coverage",
+      "*clap.js",
+      "gulpfile.js",
+      "dist",
+      "test"
+    ],
+    "check-coverage": true,
+    "statements": 100,
+    "branches": 100,
+    "functions": 100,
+    "lines": 100,
+    "cache": true
+  }
+}
