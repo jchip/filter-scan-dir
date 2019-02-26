@@ -40,6 +40,7 @@ Sync version: `filterScanDir.sync`
 - `filterExt` - array of extensions to include, apply after `ignoreExt`.
 - `filterDir` - callback to filter directories. Directory is skipped if this returns `false`
 - `includeDir` - include directories in result
+- `grouping` - enable [grouping](#grouping) if `true`
 
 `filterDir` and `filter` callback signature:
 
@@ -54,6 +55,22 @@ function filter(file, path, extras) {}
 - `extras.ext` - extension of the file
 - `extras.noExt` - file name without the extension
 - `extras.fullFile` - `Path.join(rootDir, path, file)` - `rootDir` is dir passed in to `filterScanDir`
+
+## grouping
+
+If `grouping` is true, then the results will be grouped in an object.
+
+The `filter` and `filterDir` callback can return a non-empty string as the label of a group.
+
+Assuming `filter` returns `"group1"` and `"group2"` for some files, the return value will be an object:
+
+```js
+{
+  _: [ "foo" ], // default group, when filter callback returns non-string truthy value, like `true`
+  group1: [ "file1" ],
+  group2: [ "file2" ]
+}
+```
 
 # License
 

@@ -28,12 +28,20 @@ describe("filter-scan-dir", function() {
       expect(files).to.deep.equal(["spec"]);
     });
 
-    it("should filterDir", () => {
+    it("should skip dir if filterDir return false", () => {
       const files = filterScanDir.sync({
         dir: "test",
         filterDir: () => false
       });
       expect(files).to.deep.equal(["mocha.opts"]);
+    });
+
+    it("should recuse dir if filterDir return true", () => {
+      const files = filterScanDir.sync({
+        dir: "test",
+        filterDir: () => true
+      });
+      expect(files).to.deep.equal(["mocha.opts", "spec/index.spec.js"]);
     });
 
     it("should filter files", () => {
@@ -50,6 +58,18 @@ describe("filter-scan-dir", function() {
         filter: (file, path, e) => e.noExt !== "mocha"
       });
       expect(files).to.deep.equal(["spec/index.spec.js"]);
+    });
+
+    it("should group entries if filter return string", () => {
+      const files = filterScanDir.sync({
+        dir: "test",
+        grouping: true,
+        filter: (f, p, extras) => (extras.noExt === "mocha" ? true : extras.noExt)
+      });
+      expect(files).to.deep.equal({
+        _: ["mocha.opts"],
+        "index.spec": ["spec/index.spec.js"]
+      });
     });
   });
 
@@ -76,6 +96,28 @@ describe("filter-scan-dir", function() {
         filterExt: []
       });
       expect(files).to.deep.equal(["spec"]);
+    });
+
+    it("should group directories", async () => {
+      const files = await filterScanDir({
+        dir: "test",
+        includeDir: true,
+        grouping: true,
+        filterDir: () => "dir"
+      });
+      expect(files).to.deep.equal({ dir: ["spec"], _: ["mocha.opts", "spec/index.spec.js"] });
+    });
+
+    it("should group entries if filter return string", async () => {
+      const files = await filterScanDir({
+        dir: "test",
+        grouping: true,
+        filter: (f, p, extras) => (extras.noExt === "mocha" ? "_" : extras.noExt)
+      });
+      expect(files).to.deep.equal({
+        _: ["mocha.opts"],
+        "index.spec": ["spec/index.spec.js"]
+      });
     });
   });
 });
