@@ -1,6 +1,6 @@
 # filter-scan-dir
 
-Recursively scan directory for a flat array of files.
+Recursively scan and filter directory for a flat array of files.
 
 # Install
 
@@ -21,6 +21,8 @@ console.log(files);
 filterScanDir({ dir: "test" }).then(files => {
   console.log(files);
 });
+
+console.log(await filterScanDir({ dir: "test" }));
 ```
 
 ## API
