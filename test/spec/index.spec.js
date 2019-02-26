@@ -61,5 +61,21 @@ describe("filter-scan-dir", function() {
       const files2 = await filterScanDir({ dir: "test" });
       expect(files2).to.deep.equal(expectFiles);
     });
+
+    it("should scan all files and include root", async () => {
+      const expectFiles = ["test/mocha.opts", "test/spec", "test/spec/index.spec.js"];
+      const files = await filterScanDir({ dir: "test", includeDir: true, includeRoot: true });
+      expect(files).to.deep.equal(expectFiles);
+    });
+
+    it("should ignore and filter exts", async () => {
+      const files = await filterScanDir({
+        dir: "test",
+        includeDir: true,
+        ignoreExt: [".opts"],
+        filterExt: []
+      });
+      expect(files).to.deep.equal(["spec"]);
+    });
   });
 });
