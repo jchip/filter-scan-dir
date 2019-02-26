@@ -12,6 +12,12 @@ describe("filter-scan-dir", function() {
       expect(files2).to.deep.equal(expectFiles);
     });
 
+    it("should scan all files and include root", () => {
+      const expectFiles = ["test/mocha.opts", "test/spec", "test/spec/index.spec.js"];
+      const files = filterScanDir.sync({ dir: "test", includeDir: true, includeRoot: true });
+      expect(files).to.deep.equal(expectFiles);
+    });
+
     it("should ignore and filter exts", () => {
       const files = filterScanDir.sync({
         dir: "test",

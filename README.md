@@ -32,6 +32,7 @@ Sync version: `filterScanDir.sync`
 `options`:
 
 - `dir` - directory to scan
+- `includeRoot` - add the root dir passed in to the result
 - `filter` - callback to filter files
 - `ignoreExt` - array of extensions to ignore. ext must include `.`, ie: `".js"`
 - `filterExt` - array of extensions to include, apply after `ignoreExt`.
