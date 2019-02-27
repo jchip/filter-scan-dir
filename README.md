@@ -35,7 +35,7 @@ Sync version: `filterScanDir.sync`
 
 - `dir` - directory to scan
 - `includeRoot` - add the root dir passed in to the result
-- `filter` - callback to filter files
+- `filter` - callback to filter files, `falsy` to skip, `truthy` to include file.
 - `ignoreExt` - array of extensions to ignore. ext must include `.`, ie: `".js"`
 - `filterExt` - array of extensions to include, apply after `ignoreExt`.
 - `filterDir` - callback to filter directories. Directory is skipped if this returns `false`
@@ -66,7 +66,9 @@ Assuming `filter` returns `"group1"` and `"group2"` for some files, the return v
 
 ```js
 {
-  _: [ "foo" ], // default group, when filter callback returns non-string truthy value, like `true`
+  // default group, when filter callback returns non-string truthy value
+  files: [ "foo" ],
+  // other groups
   group1: [ "file1" ],
   group2: [ "file2" ]
 }

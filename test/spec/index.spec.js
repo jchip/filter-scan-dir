@@ -67,7 +67,7 @@ describe("filter-scan-dir", function() {
         filter: (f, p, extras) => (extras.noExt === "mocha" ? true : extras.noExt)
       });
       expect(files).to.deep.equal({
-        _: ["mocha.opts"],
+        files: ["mocha.opts"],
         "index.spec": ["spec/index.spec.js"]
       });
     });
@@ -105,17 +105,17 @@ describe("filter-scan-dir", function() {
         grouping: true,
         filterDir: () => "dir"
       });
-      expect(files).to.deep.equal({ dir: ["spec"], _: ["mocha.opts", "spec/index.spec.js"] });
+      expect(files).to.deep.equal({ dir: ["spec"], files: ["mocha.opts", "spec/index.spec.js"] });
     });
 
     it("should group entries if filter return string", async () => {
       const files = await filterScanDir({
         dir: "test",
         grouping: true,
-        filter: (f, p, extras) => (extras.noExt === "mocha" ? "_" : extras.noExt)
+        filter: (f, p, extras) => (extras.noExt === "mocha" ? "files" : extras.noExt)
       });
       expect(files).to.deep.equal({
-        _: ["mocha.opts"],
+        files: ["mocha.opts"],
         "index.spec": ["spec/index.spec.js"]
       });
     });
