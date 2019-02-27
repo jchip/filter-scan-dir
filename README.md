@@ -41,6 +41,7 @@ Sync version: `filterScanDir.sync`
 - `filterDir` - callback to filter directories. Directory is skipped if this returns `false`
 - `includeDir` - include directories in result
 - `grouping` - enable [grouping](#grouping) if `true`
+- `maxLevel` - zero base max level of directories to recurse into
 
 `filterDir` and `filter` callback signature:
 
