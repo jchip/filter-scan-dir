@@ -18,6 +18,11 @@ describe("filter-scan-dir", function() {
       expect(files2).to.deep.equal(expectFiles);
     });
 
+    it("should return empty [] when no files found", () => {
+      const files2 = filterScanDir.sync({ dir: "test", filter: () => false });
+      expect(files2).to.deep.equal([]);
+    });
+
     it("should scan all files and include root", () => {
       const expectFiles = ["test/mocha.opts", "test/spec", "test/spec/index.spec.js"];
       const files = filterScanDir.sync({ dir: "test", includeDir: true, includeRoot: true });
