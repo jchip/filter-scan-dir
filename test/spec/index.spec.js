@@ -23,6 +23,15 @@ describe("filter-scan-dir", function() {
       expect(files2).to.deep.equal([]);
     });
 
+    it("should convert \\ in dir to /", () => {
+      const files = filterScanDir.sync({
+        dir: "test\\spec",
+        includeRoot: true,
+        filter: () => true
+      });
+      expect(files).to.deep.equal(["test/spec/index.spec.js"]);
+    });
+
     it("should scan all files and include root", () => {
       const expectFiles = ["test/mocha.opts", "test/spec", "test/spec/index.spec.js"];
       const files = filterScanDir.sync({ dir: "test", includeDir: true, includeRoot: true });
