@@ -33,15 +33,17 @@ Sync version: `filterScanDir.sync`
 
 `options`:
 
-- `dir` - directory to scan
-- `includeRoot` - add the root dir passed in to the result
-- `filter` - callback to filter files, `falsy` to skip, `truthy` to include file.
-- `ignoreExt` - array of extensions to ignore. ext must include `.`, ie: `".js"`
-- `filterExt` - array of extensions to include, apply after `ignoreExt`.
-- `filterDir` - callback to filter directories. Directory is skipped if this returns `false`
-- `includeDir` - include directories in result
-- `grouping` - enable [grouping](#grouping) if `true`
-- `maxLevel` - zero base max level of directories to recurse into
+| name          | description                                                                  | default    |
+| ------------- | ---------------------------------------------------------------------------- | ---------- |
+| `dir`         | root directory to start scanning                                             |            |
+| `includeRoot` | add the root dir to the result                                               |            |
+| `filter`      | callback to filter files, `falsy` to skip, `truthy` to include file.         |            |
+| `ignoreExt`   | array or string of extensions to ignore. ext must include `.`, ie: `".js"`   |            |
+| `filterExt`   | array or string of extensions to include only, apply after `ignoreExt`.      |            |
+| `filterDir`   | callback to filter directories. Directory is skipped if this returns `false` |            |
+| `includeDir`  | include directories in result if `true`                                      |            |
+| `grouping`    | enable [grouping](#grouping) if `true`                                       |            |
+| `maxLevel`    | zero base max level of directories to recurse into                           | `Infinity` |
 
 `filterDir` and `filter` callback signature:
 
@@ -49,13 +51,17 @@ Sync version: `filterScanDir.sync`
 function filter(file, path, extras) {}
 ```
 
-- `file` - name of the file being considered
-- `path` - path to directory being processed
-- `extras.stat` - result of `fs.stat` on the file
-- `extras.dirFile` - `Path.join(path, file)`
-- `extras.ext` - extension of the file
-- `extras.noExt` - file name without the extension
-- `extras.fullFile` - `Path.join(rootDir, path, file)` - `rootDir` is dir passed in to `filterScanDir`
+params:
+
+| name              | description                                    |
+| ----------------- | ---------------------------------------------- |
+| `file`            | name of the file being considered              |
+| `path`            | path to directory being processed              |
+| `extras.stat`     | result of `fs.stat` on the file                |
+| `extras.dirFile`  | `Path.join(path, file)`                        |
+| `extras.ext`      | extension of the file including `.`, ie: `.js` |
+| `extras.noExt`    | file name without the extension                |
+| `extras.fullFile` | `Path.join(rootDir, path, file)`               |
 
 ## grouping
 
