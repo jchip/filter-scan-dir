@@ -37,10 +37,10 @@ Sync version: `filterScanDir.sync`
 | ------------- | -------------------------------------------------------------------------- | ---------- |
 | `dir`         | root directory to start scanning                                           |            |
 | `includeRoot` | add the root dir to the result                                             |            |
-| `filter`      | callback to filter files that should return filter result.                 |            |
+| `filter`      | callback to filter files. it should return filter result.                  |            |
 | `ignoreExt`   | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |            |
 | `filterExt`   | array or string of extensions to include only, apply after `ignoreExt`.    |            |
-| `filterDir`   | callback to filter directories that should return filter result            |            |
+| `filterDir`   | callback to filter directories. it should return filter result             |            |
 | `includeDir`  | include directories in result if `true`                                    |            |
 | `grouping`    | enable [grouping](#grouping) if `true`                                     |            |
 | `maxLevel`    | zero base max level of directories to recurse into                         | `Infinity` |
@@ -66,11 +66,11 @@ params:
 should return filter result:
 
 - `false` - skip the file or directory
-- _string_ - name of the group to add the file or directory
+- _string_ - name of the group to add the file or directory (need to enable [grouping](#grouping))
 - _object_ - `{ group, skip, stop }` where:
-  - `group` - name of the group to add the file or directory
-  - `skip` - if `true` then skip the file or directory
-  - `stop` - stop the scanning
+  - `group` - name of the group to add the file or directory (need to enable [grouping](#grouping))
+  - `skip` - if `true` then skip the file or directory, else add it.
+  - `stop` - stop the scanning and return the result immediately
 
 ## grouping
 
