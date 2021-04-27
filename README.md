@@ -33,17 +33,17 @@ Sync version: `filterScanDir.sync`
 
 `options`:
 
-| name          | description                                                                  | default    |
-| ------------- | ---------------------------------------------------------------------------- | ---------- |
-| `dir`         | root directory to start scanning                                             |            |
-| `includeRoot` | add the root dir to the result                                               |            |
-| `filter`      | callback to filter files, `falsy` to skip, `truthy` to include file.         |            |
-| `ignoreExt`   | array or string of extensions to ignore. ext must include `.`, ie: `".js"`   |            |
-| `filterExt`   | array or string of extensions to include only, apply after `ignoreExt`.      |            |
-| `filterDir`   | callback to filter directories. Directory is skipped if this returns `false` |            |
-| `includeDir`  | include directories in result if `true`                                      |            |
-| `grouping`    | enable [grouping](#grouping) if `true`                                       |            |
-| `maxLevel`    | zero base max level of directories to recurse into                           | `Infinity` |
+| name          | description                                                                | default    |
+| ------------- | -------------------------------------------------------------------------- | ---------- |
+| `dir`         | root directory to start scanning                                           |            |
+| `includeRoot` | add the root dir to the result                                             |            |
+| `filter`      | callback to filter files that should return filter result.                 |            |
+| `ignoreExt`   | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |            |
+| `filterExt`   | array or string of extensions to include only, apply after `ignoreExt`.    |            |
+| `filterDir`   | callback to filter directories that should return filter result            |            |
+| `includeDir`  | include directories in result if `true`                                    |            |
+| `grouping`    | enable [grouping](#grouping) if `true`                                     |            |
+| `maxLevel`    | zero base max level of directories to recurse into                         | `Infinity` |
 
 `filterDir` and `filter` callback signature:
 
@@ -62,6 +62,15 @@ params:
 | `extras.ext`      | extension of the file including `.`, ie: `.js` |
 | `extras.noExt`    | file name without the extension                |
 | `extras.fullFile` | `Path.join(rootDir, path, file)`               |
+
+should return filter result:
+
+- `false` - skip the file or directory
+- _string_ - name of the group to add the file or directory
+- _object_ - `{ group, skip, stop }` where:
+  - `group` - name of the group to add the file or directory
+  - `skip` - if `true` then skip the file or directory
+  - `stop` - stop the scanning
 
 ## grouping
 

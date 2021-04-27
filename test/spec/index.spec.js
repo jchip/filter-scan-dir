@@ -2,8 +2,8 @@
 
 const filterScanDir = require("../..");
 
-describe("filter-scan-dir", function() {
-  describe("sync", function() {
+describe("filter-scan-dir", function () {
+  describe("sync", function () {
     it("should scan all files", () => {
       const expectFiles = ["mocha.opts", "spec/index.spec.js"];
       const files1 = filterScanDir.sync("test");
@@ -33,8 +33,16 @@ describe("filter-scan-dir", function() {
     });
 
     it("should scan all files and include root", () => {
-      const expectFiles = ["test/mocha.opts", "test/spec", "test/spec/index.spec.js"];
-      const files = filterScanDir.sync({ dir: "test", includeDir: true, includeRoot: true });
+      const expectFiles = [
+        "test/mocha.opts",
+        "test/spec",
+        "test/spec/index.spec.js"
+      ];
+      const files = filterScanDir.sync({
+        dir: "test",
+        includeDir: true,
+        includeRoot: true
+      });
       expect(files).to.deep.equal(expectFiles);
     });
 
@@ -64,6 +72,18 @@ describe("filter-scan-dir", function() {
       expect(files).to.deep.equal(["mocha.opts", "spec/index.spec.js"]);
     });
 
+    it("should stop scanning", () => {
+      const files = filterScanDir.sync({
+        dir: "test",
+        filterDir: dir => {
+          return {
+            stop: dir === "spec"
+          };
+        }
+      });
+      expect(files).to.deep.equal(["mocha.opts"]);
+    });
+
     it("should filter files", () => {
       const files = filterScanDir.sync({
         dir: "test",
@@ -84,7 +104,8 @@ describe("filter-scan-dir", function() {
       const files = filterScanDir.sync({
         dir: "test",
         grouping: true,
-        filter: (f, p, extras) => (extras.noExt === "mocha" ? true : extras.noExt)
+        filter: (f, p, extras) =>
+          extras.noExt === "mocha" ? true : extras.noExt
       });
       expect(files).to.deep.equal({
         files: ["mocha.opts"],
@@ -93,7 +114,7 @@ describe("filter-scan-dir", function() {
     });
   });
 
-  describe("async", function() {
+  describe("async", function () {
     it("should scan all files", async () => {
       const expectFiles = ["mocha.opts", "spec/index.spec.js"];
       const files1 = await filterScanDir("test");
@@ -102,9 +123,27 @@ describe("filter-scan-dir", function() {
       expect(files2).to.deep.equal(expectFiles);
     });
 
+    it("should stop scanning", async () => {
+      const files = await filterScanDir({
+        dir: "test",
+        filterDir: dir => {
+          return { stop: dir === "spec" };
+        }
+      });
+      expect(files).to.deep.equal(["mocha.opts"]);
+    });
+
     it("should scan all files and include root", async () => {
-      const expectFiles = ["test/mocha.opts", "test/spec", "test/spec/index.spec.js"];
-      const files = await filterScanDir({ dir: "test", includeDir: true, includeRoot: true });
+      const expectFiles = [
+        "test/mocha.opts",
+        "test/spec",
+        "test/spec/index.spec.js"
+      ];
+      const files = await filterScanDir({
+        dir: "test",
+        includeDir: true,
+        includeRoot: true
+      });
       expect(files).to.deep.equal(expectFiles);
     });
 
@@ -125,14 +164,18 @@ describe("filter-scan-dir", function() {
         grouping: true,
         filterDir: () => "dir"
       });
-      expect(files).to.deep.equal({ dir: ["spec"], files: ["mocha.opts", "spec/index.spec.js"] });
+      expect(files).to.deep.equal({
+        dir: ["spec"],
+        files: ["mocha.opts", "spec/index.spec.js"]
+      });
     });
 
     it("should group entries if filter return string", async () => {
       const files = await filterScanDir({
         dir: "test",
         grouping: true,
-        filter: (f, p, extras) => (extras.noExt === "mocha" ? "files" : extras.noExt)
+        filter: (f, p, extras) =>
+          extras.noExt === "mocha" ? "files" : extras.noExt
       });
       expect(files).to.deep.equal({
         files: ["mocha.opts"],
