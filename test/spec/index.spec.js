@@ -5,7 +5,16 @@ const filterScanDir = require("../..");
 describe("filter-scan-dir", function () {
   describe("sync", function () {
     it("should scan all files", () => {
-      const expectFiles = ["mocha.opts", "spec/index.spec.js"];
+      const expectFiles = [
+        "fixture-1/a.js",
+        "fixture-1/a.json",
+        "fixture-1/c.js",
+        "fixture-1/dir1/b.blah",
+        "fixture-1/dir1/b.js",
+        "fixture-1/dir1/d.json",
+        "mocha.opts",
+        "spec/index.spec.js"
+      ];
       const files1 = filterScanDir.sync("test");
       expect(files1).to.deep.equal(expectFiles);
       const files2 = filterScanDir.sync({ dir: "test" });
@@ -34,12 +43,16 @@ describe("filter-scan-dir", function () {
 
     it("should scan all files and include root", () => {
       const expectFiles = [
-        "test/mocha.opts",
-        "test/spec",
-        "test/spec/index.spec.js"
+        "test/fixture-1/a.js",
+        "test/fixture-1/a.json",
+        "test/fixture-1/c.js",
+        "test/fixture-1/dir1",
+        "test/fixture-1/dir1/b.blah",
+        "test/fixture-1/dir1/b.js",
+        "test/fixture-1/dir1/d.json"
       ];
       const files = filterScanDir.sync({
-        dir: "test",
+        dir: "test/fixture-1",
         includeDir: true,
         includeRoot: true
       });
@@ -51,9 +64,15 @@ describe("filter-scan-dir", function () {
         dir: "test",
         includeDir: true,
         ignoreExt: [".opts"],
-        filterExt: []
+        filterExt: ["*.json"]
       });
-      expect(files).to.deep.equal(["spec"]);
+      expect(files).to.deep.equal([
+        "fixture-1",
+        "fixture-1/a.json",
+        "fixture-1/dir1",
+        "fixture-1/dir1/d.json",
+        "spec"
+      ]);
     });
 
     it("should skip dir if filterDir return false", () => {
@@ -66,13 +85,20 @@ describe("filter-scan-dir", function () {
 
     it("should recuse dir if filterDir return true", () => {
       const files = filterScanDir.sync({
-        dir: "test",
+        dir: "test/fixture-1",
         filterDir: () => true
       });
-      expect(files).to.deep.equal(["mocha.opts", "spec/index.spec.js"]);
+      expect(files).to.deep.equal([
+        "a.js",
+        "a.json",
+        "c.js",
+        "dir1/b.blah",
+        "dir1/b.js",
+        "dir1/d.json"
+      ]);
     });
 
-    it("should stop scanning", () => {
+    it("should stop scanning when filter callback return stop true", () => {
       const files = filterScanDir.sync({
         dir: "test",
         filterDir: dir => {
@@ -81,66 +107,93 @@ describe("filter-scan-dir", function () {
           };
         }
       });
-      expect(files).to.deep.equal(["mocha.opts"]);
+      expect(files).to.deep.equal([
+        "fixture-1/a.js",
+        "fixture-1/a.json",
+        "fixture-1/c.js",
+        "fixture-1/dir1/b.blah",
+        "fixture-1/dir1/b.js",
+        "fixture-1/dir1/d.json",
+        "mocha.opts"
+      ]);
     });
 
-    it("should filter files", () => {
+    it("should filter files through filter callback", () => {
       const files = filterScanDir.sync({
-        dir: "test",
-        filter: file => file !== "mocha.opts"
+        dir: "test/fixture-1",
+        filter: file => file !== "a.json"
       });
-      expect(files).to.deep.equal(["spec/index.spec.js"]);
+      expect(files).to.deep.equal([
+        "a.js",
+        "c.js",
+        "dir1/b.blah",
+        "dir1/b.js",
+        "dir1/d.json"
+      ]);
     });
 
     it("should filter files by noExt", () => {
       const files = filterScanDir.sync({
-        dir: "test",
-        filter: (file, path, e) => e.noExt !== "mocha"
+        dir: "test/fixture-1",
+        filter: (file, path, e) => e.noExt !== "b"
       });
-      expect(files).to.deep.equal(["spec/index.spec.js"]);
+      expect(files).to.deep.equal(["a.js", "a.json", "c.js", "dir1/d.json"]);
     });
 
     it("should group entries if filter return string", () => {
       const files = filterScanDir.sync({
-        dir: "test",
+        dir: "test/fixture-1",
         grouping: true,
-        filter: (f, p, extras) =>
-          extras.noExt === "mocha" ? true : extras.noExt
+        filter: (f, p, extras) => (extras.noExt === "b" ? true : extras.noExt)
       });
       expect(files).to.deep.equal({
-        files: ["mocha.opts"],
-        "index.spec": ["spec/index.spec.js"]
+        files: ["dir1/b.blah", "dir1/b.js"],
+        a: ["a.js", "a.json"],
+        c: ["c.js"],
+        d: ["dir1/d.json"]
       });
     });
   });
 
   describe("async", function () {
     it("should scan all files", async () => {
-      const expectFiles = ["mocha.opts", "spec/index.spec.js"];
-      const files1 = await filterScanDir("test");
+      const expectFiles = [
+        "a.js",
+        "a.json",
+        "c.js",
+        "dir1/b.blah",
+        "dir1/b.js",
+        "dir1/d.json"
+      ];
+      const files1 = await filterScanDir("test/fixture-1");
+
       expect(files1).to.deep.equal(expectFiles);
-      const files2 = await filterScanDir({ dir: "test" });
+      const files2 = await filterScanDir({ dir: "test/fixture-1" });
       expect(files2).to.deep.equal(expectFiles);
     });
 
-    it("should stop scanning", async () => {
+    it("should stop scanning when filter return stop flag", async () => {
       const files = await filterScanDir({
-        dir: "test",
+        dir: "test/fixture-1",
         filterDir: dir => {
-          return { stop: dir === "spec" };
+          return { stop: dir === "dir1" };
         }
       });
-      expect(files).to.deep.equal(["mocha.opts"]);
+      expect(files).to.deep.equal(["a.js", "a.json", "c.js"]);
     });
 
     it("should scan all files and include root", async () => {
       const expectFiles = [
-        "test/mocha.opts",
-        "test/spec",
-        "test/spec/index.spec.js"
+        "test/fixture-1/a.js",
+        "test/fixture-1/a.json",
+        "test/fixture-1/c.js",
+        "test/fixture-1/dir1",
+        "test/fixture-1/dir1/b.blah",
+        "test/fixture-1/dir1/b.js",
+        "test/fixture-1/dir1/d.json"
       ];
       const files = await filterScanDir({
-        dir: "test",
+        dir: "test/fixture-1",
         includeDir: true,
         includeRoot: true
       });
@@ -149,37 +202,63 @@ describe("filter-scan-dir", function () {
 
     it("should ignore and filter exts", async () => {
       const files = await filterScanDir({
-        dir: "test",
+        dir: "test/fixture-1",
         includeDir: true,
-        ignoreExt: [".opts"],
-        filterExt: []
+        ignoreExt: ["blah"],
+        filterExt: ["js", "*.json"]
       });
-      expect(files).to.deep.equal(["spec"]);
+
+      expect(files).to.deep.equal([
+        "a.js",
+        "a.json",
+        "c.js",
+        "dir1",
+        "dir1/b.js",
+        "dir1/d.json"
+      ]);
+    });
+
+    it("should returns only files match filterExt as a string", async () => {
+      const files = await filterScanDir({
+        dir: "test/fixture-1",
+        ignoreExt: ".blah",
+        filterExt: ".json"
+      });
+      expect(files).to.deep.equal(["a.json", "dir1/d.json"]);
     });
 
     it("should group directories", async () => {
       const files = await filterScanDir({
-        dir: "test",
+        dir: "test/fixture-1",
         includeDir: true,
         grouping: true,
         filterDir: () => "dir"
       });
       expect(files).to.deep.equal({
-        dir: ["spec"],
-        files: ["mocha.opts", "spec/index.spec.js"]
+        files: [
+          "a.js",
+          "a.json",
+          "c.js",
+          "dir1/b.blah",
+          "dir1/b.js",
+          "dir1/d.json"
+        ],
+        dir: ["dir1"]
       });
     });
 
     it("should group entries if filter return string", async () => {
       const files = await filterScanDir({
-        dir: "test",
+        dir: "test/fixture-1",
         grouping: true,
         filter: (f, p, extras) =>
-          extras.noExt === "mocha" ? "files" : extras.noExt
+          extras.noExt === "b" ? "files" : extras.noExt
       });
       expect(files).to.deep.equal({
-        files: ["mocha.opts"],
-        "index.spec": ["spec/index.spec.js"]
+        files: ["dir1/b.blah", "dir1/b.js"],
+        a: ["a.js", "a.json"],
+        c: ["c.js"],
+        d: ["dir1/d.json"]
       });
     });
   });
