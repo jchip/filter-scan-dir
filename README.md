@@ -33,17 +33,18 @@ Sync version: `filterScanDir.sync`
 
 `options`:
 
-| name          | description                                                                | default    |
-| ------------- | -------------------------------------------------------------------------- | ---------- |
-| `dir`         | root directory to start scanning                                           |            |
-| `includeRoot` | add the root dir to the result                                             |            |
-| `filter`      | callback to filter files. it should return filter result.                  |            |
-| `ignoreExt`   | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |            |
-| `filterExt`   | array or string of extensions to include only, apply after `ignoreExt`.    |            |
-| `filterDir`   | callback to filter directories. it should return filter result             |            |
-| `includeDir`  | include directories in result if `true`                                    |            |
-| `grouping`    | enable [grouping](#grouping) if `true`                                     |            |
-| `maxLevel`    | zero base max level of directories to recurse into                         | `Infinity` |
+| name           | description                                                                | default    |
+| -------------- | -------------------------------------------------------------------------- | ---------- |
+| `dir`          | root directory to start scanning                                           |            |
+| `includeRoot`  | add the root dir to the result                                             |            |
+| `filter`       | callback to filter files. it should return filter result.                  |            |
+| `ignoreExt`    | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |            |
+| `filterExt`    | array or string of extensions to include only, apply after `ignoreExt`.    |            |
+| `filterDir`    | callback to filter directories. it should return filter result             |            |
+| `includeDir`   | include directories in result if `true`                                    |            |
+| `grouping`     | enable [grouping](#grouping) if `true`                                     |            |
+| `maxLevel`     | zero base max level of directories to recurse into                         | `Infinity` |
+| `rethrowError` | set to `true` to throw errors instead of ignoring them                     | `false`    |
 
 `filterDir` and `filter` callback signature:
 

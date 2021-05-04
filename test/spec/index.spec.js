@@ -153,6 +153,15 @@ describe("filter-scan-dir", function () {
         d: ["dir1/d.json"]
       });
     });
+
+    it("should rethrow errors", () => {
+      expect(() => {
+        return filterScanDir.sync({
+          dir: "blah-blah",
+          rethrowError: true
+        });
+      }).to.throw("no such file or directory");
+    });
   });
 
   describe("async", function () {
@@ -260,6 +269,20 @@ describe("filter-scan-dir", function () {
         c: ["c.js"],
         d: ["dir1/d.json"]
       });
+    });
+
+    it("should rethrow errors", async () => {
+      let err;
+      try {
+        await filterScanDir({
+          dir: "blah-blah",
+          rethrowError: true
+        });
+      } catch (e) {
+        err = e;
+      }
+      expect(err).to.be.an("Error");
+      expect(err.message).contains("no such file or directory");
     });
   });
 });
