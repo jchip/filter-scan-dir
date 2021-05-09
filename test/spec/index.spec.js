@@ -1,5 +1,6 @@
 "use strict";
 
+const Path = require("path");
 const filterScanDir = require("../..");
 
 describe("filter-scan-dir", function () {
@@ -18,6 +19,24 @@ describe("filter-scan-dir", function () {
       const files1 = filterScanDir.sync("test");
       expect(files1).to.deep.equal(expectFiles);
       const files2 = filterScanDir.sync({ dir: "test" });
+      expect(files2).to.deep.equal(expectFiles);
+    });
+
+    it("should scan all files with prefix", () => {
+      const expectFiles = [
+        "test/fixture-1/a.js",
+        "test/fixture-1/a.json",
+        "test/fixture-1/c.js",
+        "test/fixture-1/dir1/b.blah",
+        "test/fixture-1/dir1/b.js",
+        "test/fixture-1/dir1/d.json"
+      ];
+      const files1 = filterScanDir.sync({
+        cwd: process.cwd(),
+        prefix: "test/fixture-1"
+      });
+      expect(files1).to.deep.equal(expectFiles);
+      const files2 = filterScanDir.sync({ prefix: "test/fixture-1" });
       expect(files2).to.deep.equal(expectFiles);
     });
 
@@ -154,6 +173,14 @@ describe("filter-scan-dir", function () {
       });
     });
 
+    it("should ignore errors if no rethrow", () => {
+      expect(
+        filterScanDir.sync({
+          dir: "blah-blah"
+        })
+      ).to.deep.equal([]);
+    });
+
     it("should rethrow errors", () => {
       expect(() => {
         return filterScanDir.sync({
@@ -178,6 +205,24 @@ describe("filter-scan-dir", function () {
 
       expect(files1).to.deep.equal(expectFiles);
       const files2 = await filterScanDir({ dir: "test/fixture-1" });
+      expect(files2).to.deep.equal(expectFiles);
+    });
+
+    it("should scan all files with prefix", async () => {
+      const expectFiles = [
+        "fixture-1/a.js",
+        "fixture-1/a.json",
+        "fixture-1/c.js",
+        "fixture-1/dir1/b.blah",
+        "fixture-1/dir1/b.js",
+        "fixture-1/dir1/d.json"
+      ];
+      const files1 = await filterScanDir({
+        cwd: Path.resolve("test"),
+        prefix: "fixture-1"
+      });
+      expect(files1).to.deep.equal(expectFiles);
+      const files2 = await filterScanDir({ dir: "test", prefix: "fixture-1" });
       expect(files2).to.deep.equal(expectFiles);
     });
 
@@ -269,6 +314,14 @@ describe("filter-scan-dir", function () {
         c: ["c.js"],
         d: ["dir1/d.json"]
       });
+    });
+
+    it("should ignore errors if no rethrow", async () => {
+      expect(
+        await filterScanDir({
+          dir: "blah-blah"
+        })
+      ).to.deep.equal([]);
     });
 
     it("should rethrow errors", async () => {

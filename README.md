@@ -33,18 +33,19 @@ Sync version: `filterScanDir.sync`
 
 `options`:
 
-| name           | description                                                                | default    |
-| -------------- | -------------------------------------------------------------------------- | ---------- |
-| `dir`          | root directory to start scanning                                           |            |
-| `includeRoot`  | add the root dir to the result                                             |            |
-| `filter`       | callback to filter files. it should return filter result.                  |            |
-| `ignoreExt`    | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |            |
-| `filterExt`    | array or string of extensions to include only, apply after `ignoreExt`.    |            |
-| `filterDir`    | callback to filter directories. it should return filter result             |            |
-| `includeDir`   | include directories in result if `true`                                    |            |
-| `grouping`     | enable [grouping](#grouping) if `true`                                     |            |
-| `maxLevel`     | zero base max level of directories to recurse into                         | `Infinity` |
-| `rethrowError` | set to `true` to throw errors instead of ignoring them                     | `false`    |
+| name           | description                                                                | default         |
+| -------------- | -------------------------------------------------------------------------- | --------------- |
+| `cwd`          | current working directory to start scanning                                | `process.cwd()` |
+| `prefix`       | prefix to add to the paths to scan                                         |                 |
+| `prependCwd`   | prepend CWD to paths returned                                              | `false`         |
+| `filter`       | callback to filter files. it should return filter result.                  |                 |
+| `ignoreExt`    | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |                 |
+| `filterExt`    | array or string of extensions to include only, apply after `ignoreExt`.    |                 |
+| `filterDir`    | callback to filter directories. it should return filter result             |                 |
+| `includeDir`   | include directories in result if `true`                                    |                 |
+| `grouping`     | enable [grouping](#grouping) if `true`                                     |                 |
+| `maxLevel`     | zero base max level of directories to recurse into                         | `Infinity`      |
+| `rethrowError` | set to `true` to throw errors instead of ignoring them                     | `false`         |
 
 `filterDir` and `filter` callback signature:
 
@@ -62,7 +63,7 @@ params:
 | `extras.dirFile`  | `Path.join(path, file)`                        |
 | `extras.ext`      | extension of the file including `.`, ie: `.js` |
 | `extras.noExt`    | file name without the extension                |
-| `extras.fullFile` | `Path.join(rootDir, path, file)`               |
+| `extras.fullFile` | `Path.join(cwd, path, file)`                   |
 
 should return filter result:
 
