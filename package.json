@@ -7,7 +7,8 @@
     "test": "clap test-only",
     "coverage": "clap check",
     "prepack": "publish-util-prepack",
-    "postpack": "publish-util-postpack"
+    "postpack": "publish-util-postpack",
+    "prepublishOnly": "publish-util-prepublishonly"
   },
   "repository": {
     "type": "git",

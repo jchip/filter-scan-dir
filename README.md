@@ -14,15 +14,15 @@ npm install --save filter-scan-dir
 const filterScanDir = require("filter-scan-dir");
 
 // sync
-const files = filterScanDir.sync({ dir: "test" });
+const files = filterScanDir.sync({ cwd: "test" });
 console.log(files);
 
 // async
-filterScanDir({ dir: "test" }).then(files => {
+filterScanDir({ cwd: "test" }).then((files) => {
   console.log(files);
 });
 
-console.log(await filterScanDir({ dir: "test" }));
+console.log(await filterScanDir({ cwd: "test" }));
 ```
 
 ## API
@@ -38,6 +38,7 @@ Sync version: `filterScanDir.sync`
 | `cwd`          | current working directory to start scanning                                | `process.cwd()` |
 | `prefix`       | prefix to add to the paths to scan                                         |                 |
 | `prependCwd`   | prepend CWD to paths returned                                              | `false`         |
+| `sortFiles`    | sort files from each dir if `true`.                                        | `false`         |
 | `filter`       | callback to filter files. it should return filter result.                  |                 |
 | `ignoreExt`    | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |                 |
 | `filterExt`    | array or string of extensions to include only, apply after `ignoreExt`.    |                 |
@@ -69,10 +70,11 @@ should return filter result:
 
 - `false` - skip the file or directory
 - _string_ - name of the group to add the file or directory (need to enable [grouping](#grouping))
-- _object_ - `{ group, skip, stop }` where:
+- _object_ - `{ group, skip, stop, formatName }` where:
   - `group` - name of the group to add the file or directory (need to enable [grouping](#grouping))
   - `skip` - if `true` then skip the file or directory, else add it.
-  - `stop` - stop the scanning and return the result immediately
+  - `stop` - stop the scanning and return the result immediately.
+  - `formatName` - if not `undefined`, then use this as the value to add to the output.
 
 ## grouping
 
@@ -100,7 +102,7 @@ If you really want to force using Windows `\`, then you can pass in `options._pa
 
 ```js
 const path = require("path");
-scanDir({ dir: "test", _path: path });
+scanDir({ cwd: "test", _path: path });
 ```
 
 > Internally this is default to `require("path").posix`.
