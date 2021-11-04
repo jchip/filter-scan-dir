@@ -8,6 +8,7 @@
     "lint": "clap lint",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "coverage": "clap check",
+    "ci:check": "clap -n --serial check coveralls",
     "prepack": "publish-util-prepack",
     "postpack": "publish-util-postpack",
     "prepublishOnly": "publish-util-prepublishonly"
