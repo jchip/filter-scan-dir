@@ -261,11 +261,15 @@ describe("filter-scan-dir", function () {
         "blah-a.js-10",
         "blah-a.json-3",
         "blah-c.js-15",
-        "blah-dir1-160",
+        "blah-dir1-dir",
         "blah-dir1/b.blah-0",
         "blah-dir1/b.js-0",
         "blah-dir1/d.json-0",
       ];
+
+      const filterDir = (file, path, extras) => {
+        return { formatName: `blah-${extras.dirFile}-dir` };
+      };
       const filter = (file, path, extras) => {
         return {
           formatName: `blah-${extras.dirFile}-${extras.stat.size}`,
@@ -275,7 +279,7 @@ describe("filter-scan-dir", function () {
       const files = await filterScanDir({
         dir: "test/fixture-1",
         filter,
-        filterDir: filter,
+        filterDir,
         sortFiles: true,
         includeDir: true,
       });
@@ -287,11 +291,15 @@ describe("filter-scan-dir", function () {
         "blah-a.js-10",
         "blah-a.json-3",
         "blah-c.js-15",
-        "blah-dir1-160",
+        "blah-dir1-dir",
         "blah-dir1/b.blah-0",
         "blah-dir1/b.js-0",
         "blah-dir1/d.json-0",
       ];
+
+      const filterDir = (file, path, extras) => {
+        return { formatName: `blah-${extras.dirFile}-dir` };
+      };
       const filter = (file, path, extras) => {
         return {
           formatName: `blah-${extras.dirFile}-${extras.stat.size}`,
@@ -301,7 +309,7 @@ describe("filter-scan-dir", function () {
       const files = filterScanDir.sync({
         dir: "test/fixture-1",
         filter,
-        filterDir: filter,
+        filterDir,
         sortFiles: true,
         includeDir: true,
       });
