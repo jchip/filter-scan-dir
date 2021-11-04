@@ -5,6 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "clap test-only",
+    "lint": "clap lint",
+    "coveralls": "cat coverage/lcov.info | coveralls",
     "coverage": "clap check",
     "prepack": "publish-util-prepack",
     "postpack": "publish-util-postpack",
@@ -39,6 +41,7 @@
   "homepage": "https://github.com/jchip/filter-scan-dir",
   "dependencies": {},
   "devDependencies": {
+    "coveralls": "^3.1.1",
     "electrode-archetype-njs-module-dev": "^3.0.0",
     "publish-util": "^1.0.1"
   },
