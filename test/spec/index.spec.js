@@ -258,17 +258,17 @@ describe("filter-scan-dir", function () {
 
     it("should use formatName in result", async () => {
       const expectFiles = [
-        "blah-a.js-1635996305913.019-10",
-        "blah-a.json-1635996314395.2065-3",
-        "blah-c.js-1635996325259.463-15",
-        "blah-dir1-1635995100304.094-160",
-        "blah-dir1/b.blah-1635995100303.8376-0",
-        "blah-dir1/b.js-1635995100303.9631-0",
-        "blah-dir1/d.json-1635995100304.087-0",
+        "blah-a.js-10",
+        "blah-a.json-3",
+        "blah-c.js-15",
+        "blah-dir1-160",
+        "blah-dir1/b.blah-0",
+        "blah-dir1/b.js-0",
+        "blah-dir1/d.json-0",
       ];
       const filter = (file, path, extras) => {
         return {
-          formatName: `blah-${extras.dirFile}-${extras.stat.mtimeMs}-${extras.stat.size}`,
+          formatName: `blah-${extras.dirFile}-${extras.stat.size}`,
         };
       };
 
@@ -284,17 +284,17 @@ describe("filter-scan-dir", function () {
 
     it("sync version should use formatName in result", async () => {
       const expectFiles = [
-        "blah-a.js-1635996305913.019-10",
-        "blah-a.json-1635996314395.2065-3",
-        "blah-c.js-1635996325259.463-15",
-        "blah-dir1-1635995100304.094-160",
-        "blah-dir1/b.blah-1635995100303.8376-0",
-        "blah-dir1/b.js-1635995100303.9631-0",
-        "blah-dir1/d.json-1635995100304.087-0",
+        "blah-a.js-10",
+        "blah-a.json-3",
+        "blah-c.js-15",
+        "blah-dir1-160",
+        "blah-dir1/b.blah-0",
+        "blah-dir1/b.js-0",
+        "blah-dir1/d.json-0",
       ];
       const filter = (file, path, extras) => {
         return {
-          formatName: `blah-${extras.dirFile}-${extras.stat.mtimeMs}-${extras.stat.size}`,
+          formatName: `blah-${extras.dirFile}-${extras.stat.size}`,
         };
       };
 
