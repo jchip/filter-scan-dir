@@ -1,6 +1,6 @@
 {
   "name": "filter-scan-dir",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Recursively scan and filter directory for a flat array of files",
   "main": "lib/index.js",
   "scripts": {
