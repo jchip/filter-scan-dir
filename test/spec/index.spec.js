@@ -9,13 +9,13 @@ describe("filter-scan-dir", function () {
   describe("sync", function () {
     it("should scan all files", () => {
       const expectFiles = [
+        "mocha.opts",
         "fixture-1/a.js",
         "fixture-1/a.json",
         "fixture-1/c.js",
         "fixture-1/dir1/b.blah",
         "fixture-1/dir1/b.js",
         "fixture-1/dir1/d.json",
-        "mocha.opts",
         "spec/index.spec.js",
       ];
       const files1 = filterScanDir.sync("test");
@@ -45,6 +45,12 @@ describe("filter-scan-dir", function () {
     it("should scan all up to maxLevel", () => {
       const expectFiles = ["mocha.opts"];
       const files2 = filterScanDir.sync({ dir: "test", maxLevel: 0 });
+      expect(files2).to.deep.equal(expectFiles);
+    });
+
+    it("should async scan all up to maxLevel", async () => {
+      const expectFiles = ["mocha.opts"];
+      const files2 = await filterScanDir({ dir: "test", maxLevel: 0 });
       expect(files2).to.deep.equal(expectFiles);
     });
 
@@ -96,6 +102,19 @@ describe("filter-scan-dir", function () {
       ]);
     });
 
+    it("should skip file if filter return false", async () => {
+      const files = await filterScanDir({
+        dir: "test",
+        filter: (f) => {
+          if (f === "mocha.opts") {
+            return true;
+          }
+          return { skip: true };
+        },
+      });
+      expect(files).to.deep.equal(["mocha.opts"]);
+    });
+
     it("should skip dir if filterDir return false", () => {
       const files = filterScanDir.sync({
         dir: "test",
@@ -129,13 +148,13 @@ describe("filter-scan-dir", function () {
         },
       });
       expect(files).to.deep.equal([
+        "mocha.opts",
         "fixture-1/a.js",
         "fixture-1/a.json",
         "fixture-1/c.js",
         "fixture-1/dir1/b.blah",
         "fixture-1/dir1/b.js",
         "fixture-1/dir1/d.json",
-        "mocha.opts",
       ]);
     });
 
@@ -349,6 +368,7 @@ describe("filter-scan-dir", function () {
         includeDir: true,
         grouping: true,
         filterDir: () => "dir",
+        rethrowError: true,
       });
       expect(files).to.deep.equal({
         files: [
