@@ -43,20 +43,24 @@ Sync version: `filterScanDir.sync`
 
 `options`:
 
-| name           | description                                                                | default         |
-| -------------- | -------------------------------------------------------------------------- | --------------- |
-| `cwd`          | current working directory to start scanning                                | `process.cwd()` |
-| `prefix`       | prefix to add to the paths to scan                                         |                 |
-| `prependCwd`   | prepend CWD to paths returned                                              | `false`         |
-| `sortFiles`    | sort files from each dir if `true`.                                        | `false`         |
-| `filter`       | callback to filter files. it should return filter result.                  |                 |
-| `ignoreExt`    | array or string of extensions to ignore. ext must include `.`, ie: `".js"` |                 |
-| `filterExt`    | array or string of extensions to include only, apply after `ignoreExt`.    |                 |
-| `filterDir`    | callback to filter directories. it should return filter result             |                 |
-| `includeDir`   | include directories in result if `true`                                    |                 |
-| `grouping`     | enable [grouping](#grouping) if `true`                                     |                 |
-| `maxLevel`     | zero base max level of directories to recurse into                         | `Infinity`      |
-| `rethrowError` | set to `true` to throw errors instead of ignoring them                     | `false`         |
+| name           | description                                                                                                                                         | default         |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| `cwd`          | current working directory to start scanning                                                                                                         | `process.cwd()` |
+| `prefix`       | prefix to add to the paths to scan                                                                                                                  |                 |
+| `prependCwd`   | prepend CWD to paths returned                                                                                                                       | `false`         |
+| `sortFiles`    | sort files from each dir if `true`.                                                                                                                 | `false`         |
+| `filter`       | callback to filter files. it should return filter result.                                                                                           |                 |
+| `ignoreExt`    | array or string of extensions to ignore. ext must include `.`, ie: `".js"`                                                                          |                 |
+| `filterExt`    | array or string of extensions to include only, apply after `ignoreExt`.                                                                             |                 |
+| `filterDir`    | callback to filter directories. it should return filter result                                                                                      |                 |
+| `includeDir`   | include directories in result if `true`                                                                                                             |                 |
+| `grouping`     | enable [grouping](#grouping) if `true`                                                                                                              |                 |
+| `maxLevel`     | zero base max level of directories to recurse into                                                                                                  | `Infinity`      |
+| `fullStat`     | use `fs.lstat` to get stat of each file, instead of `readir`'s `withFileTypes` option. for significant performance improvement, set this to `false` | `true`          |
+| `concurrency`  | for async version only - numer of directories to process concurrently                                                                               | `50`            |
+| `rethrowError` | set to `true` to throw errors instead of ignoring them                                                                                              | `false`         |
+
+> NOTE: setting `concurrency` to a very large number, or `Infinity`, could potentially increase performance very significantly, however, there is a dimishing return and more memory usage, so the default is already fairly good.
 
 `filterDir` and `filter` callback signature:
 
