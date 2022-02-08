@@ -3,15 +3,18 @@
   "version": "1.4.1",
   "description": "Recursively scan and filter directory for a flat array of files",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "test": "clap test-only",
+    "build": "rm -rf dist && tsc",
+    "test": "xrun -x build xarc/test-only",
     "lint": "clap lint",
     "coveralls": "cat coverage/lcov.info | coveralls",
-    "coverage": "clap check",
-    "ci:check": "clap -n --serial check coveralls",
+    "coverage": "xrun -x build xarc/test-cov",
+    "ci:check": "xrun --serial build check coveralls",
     "prepack": "publish-util-prepack",
     "postpack": "publish-util-postpack",
-    "prepublishOnly": "publish-util-prepublishonly"
+    "prepublishOnly": "xrun --serial [[build, docs], xarc/check]",
+    "docs": "xrun xarc/docs && touch docs/.nojekyll"
   },
   "repository": {
     "type": "git",
@@ -21,6 +24,7 @@
     "registry": "https://registry.npmjs.com/"
   },
   "files": [
+    "dist",
     "lib"
   ],
   "keywords": [
@@ -32,7 +36,9 @@
     "dir",
     "directory",
     "readdir",
-    "fs"
+    "fs",
+    "fast",
+    "glob"
   ],
   "author": "Joel Chen <joel123@gmail.com>",
   "license": "Apache-2.0",
@@ -42,9 +48,26 @@
   "homepage": "https://github.com/jchip/filter-scan-dir",
   "dependencies": {},
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.2.0",
+    "@types/node": "^14.14.16",
+    "@types/sinon": "^9.0.10",
+    "@types/sinon-chai": "^3.2.5",
+    "@xarc/module-dev": "^4.1.0",
+    "chai": "^4.3.4",
     "coveralls": "^3.1.1",
-    "electrode-archetype-njs-module-dev": "^3.0.0",
-    "publish-util": "^1.2.1"
+    "mocha": "^9.1.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.3.2",
+    "publish-util": "^1.2.1",
+    "run-verify": "^1.2.6",
+    "sinon": "^9.2.2",
+    "sinon-chai": "^3.5.0",
+    "source-map-support": "^0.5.19",
+    "ts-node": "^10.2.1",
+    "typedoc": "^0.21.6",
+    "typescript": "^4.3.5"
   },
   "nyc": {
     "all": true,
@@ -54,20 +77,47 @@
       "text-summary"
     ],
     "exclude": [
-      "coverage",
       "*clap.js",
-      "gulpfile.js",
+      "*clap.ts",
+      ".eslintrc.js",
+      "coverage",
       "dist",
-      "test"
+      "docs",
+      "gulpfile.js",
+      "test",
+      "xrun*.js",
+      "xrun*.ts"
     ],
     "check-coverage": true,
     "statements": 100,
     "branches": 100,
     "functions": 100,
     "lines": 100,
-    "cache": true
+    "cache": true,
+    "extends": [
+      "@istanbuljs/nyc-config-typescript"
+    ]
   },
   "engines": {
     "node": ">=8"
+  },
+  "mocha": {
+    "require": [
+      "ts-node/register",
+      "source-map-support/register",
+      "@xarc/module-dev/config/test/setup.js"
+    ],
+    "recursive": true
+  },
+  "prettier": {
+    "printWidth": 100
+  },
+  "@xarc/module-dev": {
+    "features": [
+      "mocha",
+      "prettier",
+      "typedoc",
+      "typescript"
+    ]
   }
 }
