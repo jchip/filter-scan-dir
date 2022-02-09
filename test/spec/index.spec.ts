@@ -1,12 +1,13 @@
 "use strict";
 
-const { expect } = require("chai");
-const fsd = require("../..");
+import { expect } from "chai";
+import fsd from "../..";
+import { direntCmp } from "../../src/dirent-cmp";
 
 describe("commonjs export", function () {
   it("should have proper exports", () => {
     expect(fsd).to.be.a("function");
-    expect(fsd.sync).to.be.a("function");
+    expect((fsd as any).sync).to.be.a("function");
     expect(fsd.filterScanDir).to.be.a("function");
     expect(fsd.filterScanDirSync).to.be.a("function");
   });

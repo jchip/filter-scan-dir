@@ -3,6 +3,7 @@
 import Fs, { Dirent, Stats } from "fs";
 import Path from "path";
 import Util from "util";
+import { direntCmp } from "./dirent-cmp";
 
 /**
  * type of the 3rd argument for the filter callback
@@ -119,7 +120,7 @@ export type Options = {
 type InternalOpts = Options & {
   _concurrentCount?: number;
   /** join two paths together */
-  _join2: Function;
+  _join2: (a: string, b: string) => string;
   result: Record<string, string[]>;
   readdirOpts: any;
   dir: string;
@@ -251,28 +252,6 @@ function getResult(options: InternalOpts): GroupingResult | string[] {
 }
 
 /**
- * compare Dirent for sorting
- *
- * @param a
- * @param b
- * @returns
- */
-const direntCmp = (a: Dirent, b: Dirent): number => {
-  /* istanbul ignore next */
-  if (a.name === b.name) {
-    /* istanbul ignore next */
-    return 0;
-    /* istanbul ignore next */
-  } else if (a.name > b.name) {
-    /* istanbul ignore next */
-    return 1;
-  } else {
-    /* istanbul ignore next */
-    return -1;
-  }
-};
-
-/**
  * sync version of directory walk
  *
  * @param path
@@ -302,7 +281,7 @@ function walkSync(path: string, options: InternalOpts, level = 0) {
       let extras: ExtrasData;
 
       if (options.fullStat) {
-        const fullFile = options._join2(dir, file);
+        const fullFile = options._join2(dir, file as string);
         const stat = Fs.lstatSync(fullFile);
         extras = makeExtrasData(file as string, fullFile, path, stat, options);
       } else {
@@ -372,7 +351,7 @@ async function walk(path: string, options: InternalOpts, level = 0) {
       let extras;
 
       if (options.fullStat) {
-        const fullFile = options._join2(dir, file);
+        const fullFile = options._join2(dir, file as string);
         const stat = await asyncLStat(fullFile);
         extras = makeExtrasData(file as string, fullFile, path, stat, options);
       } else {
@@ -468,7 +447,7 @@ function makeOptions(opts: string | Options): InternalOpts {
 
   // a simple and faster version of path.join that handles just 2
   // arguments using posix separator
-  const _join2 = (a: string, b: string) => (a && b ? a + sep + b : a ? a : b); // eslint-disable-line
+  const _join2 = (a: string, b: string) => (a && b ? a + sep + b : a || b);
 
   const opts2: InternalOpts = Object.assign(
     {

@@ -1,7 +1,5 @@
 # filter-scan-dir
 
-[![dependency status][deps-svg]][deps-url]
-[![dev dependency status][dev-deps-svg]][dev-deps-url]
 [![License][license-image]][license-url]
 [![build][build-image]][build-url]
 [![coverage][coverage-image]][coverage-url]
@@ -14,8 +12,8 @@ Recursively scan and filter directory for a flat array of files.
 
 - Supports super fast concurrent mode in async version.
 
-- **[API Docs](https://jchip.github.io/filter-scan-dir/modules.html#filterScanDir)**
-- **[Github](https://github.com/jchip/filter-scan-dir)**
+- **[API Docs]**
+- **[Github]**
 
 # Install
 
@@ -34,6 +32,8 @@ console.log(filterScanDirSync({ cwd: "test" }));
 // async
 console.log(await filterScanDir({ cwd: "test" }));
 ```
+
+- **[API Docs]**
 
 # License
 
@@ -54,3 +54,5 @@ Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses
 [downloads-image]: https://img.shields.io/npm/dm/filter-scan-dir.svg
 [downloads-url]: https://npm-stat.com/charts.html?package=filter-scan-dir
 [npm-badge-png]: https://nodei.co/npm/filter-scan-dir.png?downloads=true&stars=true
+[api docs]: https://jchip.github.io/filter-scan-dir/modules.html#filterScanDir
+[github]: https://github.com/jchip/filter-scan-dir
