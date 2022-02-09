@@ -2,7 +2,6 @@
 
 import { expect } from "chai";
 import fsd from "../..";
-import { direntCmp } from "../../src/dirent-cmp";
 
 describe("commonjs export", function () {
   it("should have proper exports", () => {

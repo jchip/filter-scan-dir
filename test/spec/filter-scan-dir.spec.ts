@@ -1,5 +1,5 @@
 import Path from "path";
-import { filterScanDir, filterScanDirSync } from "../../src/filter-scan-dir";
+import { filterScanDir, filterScanDirSync } from "../../src";
 import { expect } from "chai";
 import { asyncVerify, runFinally } from "run-verify";
 
