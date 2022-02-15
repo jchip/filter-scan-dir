@@ -20,4 +20,9 @@ describe("commonjs export", function () {
     const files = await fsd("test/fixture-2");
     expect(files).to.deep.equal(["bar.js", "blah.txt", "foo.js"]);
   });
+
+  it("should scan files with sync api", async () => {
+    const sfiles = fsd.sync("test/fixture-2");
+    expect(sfiles).to.deep.equal(["bar.js", "blah.txt", "foo.js"]);
+  });
 });
