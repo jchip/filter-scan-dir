@@ -59,14 +59,14 @@ describe("filter-scan-dir", function () {
     });
 
     it("should scan all up to maxLevel", () => {
-      const expectFiles = ["mocha.opts"];
-      const files2 = filterScanDirSync({ cwd: "test", maxLevel: 0 });
+      const expectFiles = ["a.js", "a.json", "c.js"];
+      const files2 = filterScanDirSync({ cwd: "test/fixture-1", maxLevel: 0 });
       expect(files2).to.deep.equal(expectFiles);
     });
 
     it("should async scan all up to maxLevel", async () => {
-      const expectFiles = ["mocha.opts"];
-      const files2 = await filterScanDir({ cwd: "test", maxLevel: 0 });
+      const expectFiles = ["a.js", "a.json", "c.js"];
+      const files2 = await filterScanDir({ cwd: "test/fixture-1", maxLevel: 0 });
       expect(files2).to.deep.equal(expectFiles);
     });
 
@@ -164,23 +164,23 @@ describe("filter-scan-dir", function () {
 
     it("should skip file if filter return false", async () => {
       const files = await filterScanDir({
-        cwd: "test",
+        cwd: "test/fixture-1",
         filter: (f) => {
-          if (f === "mocha.opts") {
+          if (f === "a.json") {
             return true;
           }
           return { skip: true };
         },
       });
-      expect(files).to.deep.equal(["mocha.opts"]);
+      expect(files).to.deep.equal(["a.json"]);
     });
 
     it("should skip dir if filterDir return false", () => {
       const files = filterScanDirSync({
-        cwd: "test",
+        cwd: "test/fixture-1",
         filterDir: () => false,
       });
-      expect(files).to.deep.equal(["mocha.opts"]);
+      expect(files).to.deep.equal(["a.js", "a.json", "c.js"]);
     });
 
     it("should recuse dir if filterDir return true", () => {
@@ -208,7 +208,6 @@ describe("filter-scan-dir", function () {
         },
       });
       expect(files).to.deep.equal([
-        "mocha.opts",
         "fixture-1/a.js",
         "fixture-1/a.json",
         "fixture-1/c.js",
