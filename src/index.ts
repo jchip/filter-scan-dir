@@ -77,8 +77,6 @@ export type Options = {
   sortFiles?: boolean;
   /** include directories in result */
   includeDir?: boolean;
-  /** enable grouping of files */
-  grouping?: boolean;
   /** zero base max level of directories to recurse into. Default: `Infinity`  */
   maxLevel?: number;
   /**
@@ -117,7 +115,19 @@ export type Options = {
   pathSep?: string;
 };
 
-type InternalOpts = Options & {
+/**
+ * options specifically to set grouping flag `true` to enable grouping of files
+ */
+export type GroupingOptions = {
+  /**
+   * enable grouping of files
+   * This is default to disabled, so it's only expecting `true` to enable it.
+   */
+  grouping: true;
+} & Options;
+
+/** internal options and data */
+type InternalOpts = GroupingOptions & {
   _concurrentCount?: number;
   /** join two paths together */
   _join2: (a: string, b: string) => string;
@@ -126,6 +136,16 @@ type InternalOpts = Options & {
   dir: string;
 };
 
+/**
+ * create a new ExtrasData object
+ *
+ * @param file
+ * @param fullFile
+ * @param path
+ * @param stat
+ * @param options
+ * @returns
+ */
 function makeExtrasData(
   file: string,
   fullFile: string,
@@ -458,6 +478,7 @@ function makeOptions(opts: string | Options): InternalOpts {
       fullStat: true,
       concurrency: 50,
       readdirOpts: undefined,
+      grouping: undefined,
     },
     options,
     {
@@ -487,12 +508,18 @@ function makeOptions(opts: string | Options): InternalOpts {
  * @param options
  * @returns
  */
+export function filterScanDir(options?: string): Promise<string[]>;
+export function filterScanDir(options?: Options): Promise<string[]>;
+export function filterScanDir(options?: GroupingOptions): Promise<GroupingResult>;
 export function filterScanDir(options: string | Options = {}): Promise<string[] | GroupingResult> {
   const options2 = makeOptions(options);
   return walk(options2.prefix, options2);
 }
 
 /** sync version of filter scan dir */
+export function filterScanDirSync(options?: string): string[];
+export function filterScanDirSync(options?: Options): string[];
+export function filterScanDirSync(options?: GroupingOptions): GroupingResult;
 export function filterScanDirSync(options: string | Options = {}): string[] | GroupingResult {
   const options2 = makeOptions(options);
   return walkSync(options2.prefix, options2);

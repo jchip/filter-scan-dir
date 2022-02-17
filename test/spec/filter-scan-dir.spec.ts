@@ -180,7 +180,8 @@ describe("filter-scan-dir", function () {
         cwd: "test/fixture-1",
         filterDir: () => false,
       });
-      expect(files).to.deep.equal(["a.js", "a.json", "c.js"]);
+      // call .sort to make TS verify that files is string[]
+      expect(files.sort()).to.deep.equal(["a.js", "a.json", "c.js"]);
     });
 
     it("should recuse dir if filterDir return true", () => {
@@ -237,12 +238,14 @@ describe("filter-scan-dir", function () {
     });
 
     it("should group entries if filter return string", () => {
-      const files = filterScanDirSync({
+      const grouped = filterScanDirSync({
         cwd: "test/fixture-1",
         grouping: true,
         filter: (f, p, extras) => (extras.noExt === "b" ? true : extras.noExt),
       });
-      expect(files).to.deep.equal({
+      const files = grouped.files.sort();
+      expect(files).to.deep.equal(["dir1/b.blah", "dir1/b.js"]);
+      expect(grouped).to.deep.equal({
         files: ["dir1/b.blah", "dir1/b.js"],
         a: ["a.js", "a.json"],
         c: ["c.js"],
