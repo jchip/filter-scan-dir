@@ -3,7 +3,7 @@
 import Fs, { Dirent, Stats } from "fs";
 import Path from "path";
 import Util from "util";
-import { direntCmp } from "./dirent-cmp";
+import { direntCmp, makePathJoin2 } from "./util";
 
 /**
  * type of the 3rd argument for the filter callback
@@ -465,13 +465,9 @@ function makeOptions(opts: string | Options): InternalOpts {
     (options.hasOwnProperty("includeRoot") ? (options as any).includeRoot : options.prependCwd) ||
     false;
 
-  // a simple and faster version of path.join that handles just 2
-  // arguments using posix separator
-  const _join2 = (a: string, b: string) => (a && b ? a + sep + b : a || b);
-
   const opts2: InternalOpts = Object.assign(
     {
-      _join2,
+      _join2: undefined,
       maxLevel: Infinity,
       prefix: "",
       prependCwd,
@@ -495,6 +491,8 @@ function makeOptions(opts: string | Options): InternalOpts {
       _concurrentCount: 0,
     }
   );
+
+  opts2._join2 = makePathJoin2(sep, opts2.dir, opts2.prefix);
 
   if (!opts2.fullStat) {
     opts2.readdirOpts = { withFileTypes: true };
