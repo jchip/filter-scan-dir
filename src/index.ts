@@ -23,6 +23,8 @@ export type ExtrasData = {
   ext: string;
   /** file name without the extension */
   noExt: string;
+  /** files in the directory */
+  files: (string | Dirent)[];
 };
 
 /**
@@ -151,6 +153,7 @@ function makeExtrasData(
   fullFile: string,
   path: string,
   stat: Dirent | Stats,
+  files: (string | Dirent)[],
   options: InternalOpts
 ): ExtrasData {
   const dirFile: string = options._join2(path, file);
@@ -165,6 +168,7 @@ function makeExtrasData(
       dirFile,
       ext: file.substring(ix),
       noExt: file.substring(0, ix),
+      files,
     };
   } else {
     return {
@@ -175,6 +179,7 @@ function makeExtrasData(
       dirFile,
       ext: "",
       noExt: file,
+      files,
     };
   }
 }
@@ -303,10 +308,17 @@ function walkSync(path: string, options: InternalOpts, level = 0) {
       if (options.fullStat) {
         const fullFile = options._join2(dir, file as string);
         const stat = Fs.lstatSync(fullFile);
-        extras = makeExtrasData(file as string, fullFile, path, stat, options);
+        extras = makeExtrasData(file as string, fullFile, path, stat, files, options);
       } else {
         const fullFile = options._join2(dir, (file as Dirent).name);
-        extras = makeExtrasData((file as Dirent).name, fullFile, path, file as Dirent, options);
+        extras = makeExtrasData(
+          (file as Dirent).name,
+          fullFile,
+          path,
+          file as Dirent,
+          files,
+          options
+        );
       }
 
       if (extras.stat.isDirectory()) {
@@ -373,10 +385,17 @@ async function walk(path: string, options: InternalOpts, level = 0) {
       if (options.fullStat) {
         const fullFile = options._join2(dir, file as string);
         const stat = await asyncLStat(fullFile);
-        extras = makeExtrasData(file as string, fullFile, path, stat, options);
+        extras = makeExtrasData(file as string, fullFile, path, stat, files, options);
       } else {
         const fullFile = options._join2(dir, (file as Dirent).name);
-        extras = makeExtrasData((file as Dirent).name, fullFile, path, file as Dirent, options);
+        extras = makeExtrasData(
+          (file as Dirent).name,
+          fullFile,
+          path,
+          file as Dirent,
+          files,
+          options
+        );
       }
 
       if (extras.stat.isDirectory()) {
