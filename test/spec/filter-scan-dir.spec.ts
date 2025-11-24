@@ -1,7 +1,6 @@
 import Path from "path";
-import { filterScanDir, filterScanDirSync } from "../../src";
-import { expect } from "chai";
-import { asyncVerify, runFinally } from "run-verify";
+import { filterScanDir, filterScanDirSync } from "../../src/index.ts";
+import { describe, it, expect } from "vitest";
 
 describe("filter-scan-dir", function () {
   describe("sync", function () {
@@ -22,22 +21,21 @@ describe("filter-scan-dir", function () {
         filter,
         filterDir: filter,
       });
-      expect(files1).to.deep.equal(expectFiles);
+      expect(files1).toEqual(expectFiles);
     });
 
     it("should handle passing no options", async () => {
       const save = process.cwd();
 
-      return asyncVerify(
-        () => {
-          const files1 = filterScanDirSync("test/fixture-1");
-          process.chdir("test/fixture-1");
+      try {
+        const files1 = filterScanDirSync("test/fixture-1");
+        process.chdir("test/fixture-1");
 
-          const files2 = filterScanDirSync();
-          expect(files2).to.deep.equal(files1);
-        },
-        runFinally(() => process.chdir(save))
-      );
+        const files2 = filterScanDirSync();
+        expect(files2).toEqual(files1);
+      } finally {
+        process.chdir(save);
+      }
     });
 
     it("should scan all files with prefix", () => {
@@ -53,26 +51,26 @@ describe("filter-scan-dir", function () {
         cwd: process.cwd(),
         prefix: "test/fixture-1",
       });
-      expect(files1).to.deep.equal(expectFiles);
+      expect(files1).toEqual(expectFiles);
       const files2 = filterScanDirSync({ prefix: "test/fixture-1" });
-      expect(files2).to.deep.equal(expectFiles);
+      expect(files2).toEqual(expectFiles);
     });
 
     it("should scan all up to maxLevel", () => {
       const expectFiles = ["a.js", "a.json", "c.js"];
       const files2 = filterScanDirSync({ cwd: "test/fixture-1", maxLevel: 0 });
-      expect(files2).to.deep.equal(expectFiles);
+      expect(files2).toEqual(expectFiles);
     });
 
     it("should async scan all up to maxLevel", async () => {
       const expectFiles = ["a.js", "a.json", "c.js"];
       const files2 = await filterScanDir({ cwd: "test/fixture-1", maxLevel: 0 });
-      expect(files2).to.deep.equal(expectFiles);
+      expect(files2).toEqual(expectFiles);
     });
 
     it("should return empty [] when no files found", () => {
       const files2 = filterScanDirSync({ cwd: "test", filter: () => false });
-      expect(files2).to.deep.equal([]);
+      expect(files2).toEqual([]);
     });
 
     it("should convert \\ in dir to /", () => {
@@ -81,7 +79,7 @@ describe("filter-scan-dir", function () {
         prependCwd: true,
         filter: () => true,
       });
-      expect(files).to.deep.equal([
+      expect(files).toEqual([
         "test/fixture-2/bar.js",
         "test/fixture-2/blah.txt",
         "test/fixture-2/foo.js",
@@ -103,7 +101,7 @@ describe("filter-scan-dir", function () {
         includeDir: true,
         prependCwd: true,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should handle fullStat false", () => {
@@ -122,7 +120,7 @@ describe("filter-scan-dir", function () {
         prependCwd: true,
         fullStat: false,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should handle fullStat false with sortFiles", () => {
@@ -142,7 +140,7 @@ describe("filter-scan-dir", function () {
         fullStat: false,
         sortFiles: true,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should ignore and filter exts", () => {
@@ -151,8 +149,9 @@ describe("filter-scan-dir", function () {
         includeDir: true,
         ignoreExt: [".opts"],
         filterExt: ["*.json"],
+        filterDir: (dir) => !dir.startsWith("fixture-symlink"), // Skip symlink fixture
       });
-      expect(files).to.deep.equal([
+      expect(files).toEqual([
         "fixture-1",
         "fixture-1/a.json",
         "fixture-1/dir1",
@@ -172,7 +171,7 @@ describe("filter-scan-dir", function () {
           return { skip: true };
         },
       });
-      expect(files).to.deep.equal(["a.json"]);
+      expect(files).toEqual(["a.json"]);
     });
 
     it("should skip dir if filterDir return false", () => {
@@ -181,7 +180,7 @@ describe("filter-scan-dir", function () {
         filterDir: () => false,
       });
       // call .sort to make TS verify that files is string[]
-      expect(files.sort()).to.deep.equal(["a.js", "a.json", "c.js"]);
+      expect(files.sort()).toEqual(["a.js", "a.json", "c.js"]);
     });
 
     it("should recuse dir if filterDir return true", () => {
@@ -189,26 +188,20 @@ describe("filter-scan-dir", function () {
         cwd: "test/fixture-1",
         filterDir: () => true,
       });
-      expect(files).to.deep.equal([
-        "a.js",
-        "a.json",
-        "c.js",
-        "dir1/b.blah",
-        "dir1/b.js",
-        "dir1/d.json",
-      ]);
+      expect(files).toEqual(["a.js", "a.json", "c.js", "dir1/b.blah", "dir1/b.js", "dir1/d.json"]);
     });
 
     it("should stop scanning when filter callback return stop true", () => {
       const files = filterScanDirSync({
         cwd: "test",
         filterDir: (dir) => {
+          if (dir === "fixture-symlink") return { skip: true }; // Skip symlink fixture
           return {
             stop: dir === "spec",
           };
         },
       });
-      expect(files).to.deep.equal([
+      expect(files).toEqual([
         "fixture-1/a.js",
         "fixture-1/a.json",
         "fixture-1/c.js",
@@ -226,7 +219,7 @@ describe("filter-scan-dir", function () {
         cwd: "test/fixture-1",
         filter: (file) => file !== "a.json",
       });
-      expect(files).to.deep.equal(["a.js", "c.js", "dir1/b.blah", "dir1/b.js", "dir1/d.json"]);
+      expect(files).toEqual(["a.js", "c.js", "dir1/b.blah", "dir1/b.js", "dir1/d.json"]);
     });
 
     it("should filter files by noExt", () => {
@@ -234,7 +227,7 @@ describe("filter-scan-dir", function () {
         cwd: "test/fixture-1",
         filter: (file, path, e) => e.noExt !== "b",
       });
-      expect(files).to.deep.equal(["a.js", "a.json", "c.js", "dir1/d.json"]);
+      expect(files).toEqual(["a.js", "a.json", "c.js", "dir1/d.json"]);
     });
 
     it("should group entries if filter return string", () => {
@@ -244,8 +237,8 @@ describe("filter-scan-dir", function () {
         filter: (f, p, extras) => (extras.noExt === "b" ? true : extras.noExt),
       });
       const files = grouped.files.sort();
-      expect(files).to.deep.equal(["dir1/b.blah", "dir1/b.js"]);
-      expect(grouped).to.deep.equal({
+      expect(files).toEqual(["dir1/b.blah", "dir1/b.js"]);
+      expect(grouped).toEqual({
         files: ["dir1/b.blah", "dir1/b.js"],
         a: ["a.js", "a.json"],
         c: ["c.js"],
@@ -257,8 +250,8 @@ describe("filter-scan-dir", function () {
       expect(
         filterScanDirSync({
           cwd: "blah-blah",
-        })
-      ).to.deep.equal([]);
+        }),
+      ).toEqual([]);
     });
 
     it("should rethrow errors", () => {
@@ -267,7 +260,7 @@ describe("filter-scan-dir", function () {
           cwd: "blah-blah",
           rethrowError: true,
         });
-      }).to.throw("no such file or directory");
+      }).toThrow("no such file or directory");
     });
   });
 
@@ -276,24 +269,23 @@ describe("filter-scan-dir", function () {
       const expectFiles = ["a.js", "a.json", "c.js", "dir1/b.blah", "dir1/b.js", "dir1/d.json"];
       const files1 = await filterScanDir("test/fixture-1");
 
-      expect(files1).to.deep.equal(expectFiles);
+      expect(files1).toEqual(expectFiles);
       const files2 = await filterScanDir({ cwd: "test/fixture-1" });
-      expect(files2).to.deep.equal(expectFiles);
+      expect(files2).toEqual(expectFiles);
     });
 
     it("should handle passing no options", async () => {
       const save = process.cwd();
 
-      return asyncVerify(
-        async () => {
-          const files1 = await filterScanDir("test/fixture-1");
-          process.chdir("test/fixture-1");
+      try {
+        const files1 = await filterScanDir("test/fixture-1");
+        process.chdir("test/fixture-1");
 
-          const files2 = await filterScanDir();
-          expect(files2).to.deep.equal(files1);
-        },
-        runFinally(() => process.chdir(save))
-      );
+        const files2 = await filterScanDir();
+        expect(files2).toEqual(files1);
+      } finally {
+        process.chdir(save);
+      }
     });
 
     it("should scan all files with prefix", async () => {
@@ -309,21 +301,21 @@ describe("filter-scan-dir", function () {
         cwd: Path.resolve("test"),
         prefix: "fixture-1",
       });
-      expect(files1).to.deep.equal(expectFiles);
+      expect(files1).toEqual(expectFiles);
       const files2 = await filterScanDir({ cwd: "test", prefix: "fixture-1" });
-      expect(files2).to.deep.equal(expectFiles);
+      expect(files2).toEqual(expectFiles);
     });
 
     it("should support concurrency 1", async () => {
       const files1 = await filterScanDir({ cwd: "test", sortFiles: true });
       const files2 = await filterScanDir({ cwd: "test", concurrency: 1, sortFiles: true });
-      expect((files2 as string[]).sort()).to.deep.equal((files1 as string[]).sort());
+      expect((files2 as string[]).sort()).toEqual((files1 as string[]).sort());
     });
 
     it("should support concurrency 2", async () => {
       const files1 = await filterScanDir("test");
       const files2 = await filterScanDir({ cwd: "test", concurrency: 2 });
-      expect((files2 as string[]).sort()).to.deep.equal((files1 as string[]).sort());
+      expect((files2 as string[]).sort()).toEqual((files1 as string[]).sort());
     });
 
     it("should stop scanning when filter return stop flag", async () => {
@@ -333,7 +325,7 @@ describe("filter-scan-dir", function () {
           return { stop: dir === "dir1" };
         },
       });
-      expect(files).to.deep.equal(["a.js", "a.json", "c.js"]);
+      expect(files).toEqual(["a.js", "a.json", "c.js"]);
     });
 
     it("should scan all files and include root", async () => {
@@ -351,7 +343,7 @@ describe("filter-scan-dir", function () {
         includeDir: true,
         prependCwd: true,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should handle fullStat false", async () => {
@@ -370,7 +362,7 @@ describe("filter-scan-dir", function () {
         prependCwd: true,
         fullStat: false,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should handle fullStat false and sortFiles", async () => {
@@ -390,7 +382,7 @@ describe("filter-scan-dir", function () {
         fullStat: false,
         sortFiles: true,
       } as any);
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should use formatName in result", async () => {
@@ -420,7 +412,7 @@ describe("filter-scan-dir", function () {
         sortFiles: true,
         includeDir: true,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("sync version should use formatName in result", async () => {
@@ -450,7 +442,7 @@ describe("filter-scan-dir", function () {
         sortFiles: true,
         includeDir: true,
       });
-      expect(files).to.deep.equal(expectFiles);
+      expect(files).toEqual(expectFiles);
     });
 
     it("should ignore and filter exts", async () => {
@@ -461,7 +453,7 @@ describe("filter-scan-dir", function () {
         filterExt: ["js", "*.json"],
       });
 
-      expect(files).to.deep.equal(["a.js", "a.json", "c.js", "dir1", "dir1/b.js", "dir1/d.json"]);
+      expect(files).toEqual(["a.js", "a.json", "c.js", "dir1", "dir1/b.js", "dir1/d.json"]);
     });
 
     it("should returns only files match filterExt as a string", async () => {
@@ -470,7 +462,7 @@ describe("filter-scan-dir", function () {
         ignoreExt: ".blah",
         filterExt: ".json",
       });
-      expect(files).to.deep.equal(["a.json", "dir1/d.json"]);
+      expect(files).toEqual(["a.json", "dir1/d.json"]);
     });
 
     it("should group directories", async () => {
@@ -481,7 +473,7 @@ describe("filter-scan-dir", function () {
         filterDir: () => "dir",
         rethrowError: true,
       });
-      expect(files).to.deep.equal({
+      expect(files).toEqual({
         files: ["a.js", "a.json", "c.js", "dir1/b.blah", "dir1/b.js", "dir1/d.json"],
         dir: ["dir1"],
       });
@@ -493,7 +485,7 @@ describe("filter-scan-dir", function () {
         grouping: true,
         filter: (f, p, extras) => (extras.noExt === "b" ? "files" : extras.noExt),
       });
-      expect(files).to.deep.equal({
+      expect(files).toEqual({
         files: ["dir1/b.blah", "dir1/b.js"],
         a: ["a.js", "a.json"],
         c: ["c.js"],
@@ -505,8 +497,8 @@ describe("filter-scan-dir", function () {
       expect(
         await filterScanDir({
           cwd: "blah-blah",
-        })
-      ).to.deep.equal([]);
+        }),
+      ).toEqual([]);
     });
 
     it("should rethrow errors", async () => {
@@ -519,8 +511,68 @@ describe("filter-scan-dir", function () {
       } catch (e) {
         err = e;
       }
-      expect(err).to.be.an("Error");
-      expect(err.message).contains("no such file or directory");
+      expect(err).toBeInstanceOf(Error);
+      expect(err.message).toContain("no such file or directory");
+    });
+  });
+
+  describe("symlink handling", function () {
+    it("should exclude symlinks to directories when includeDir is false and includeSymlink is not set", () => {
+      // This tests the uncovered lines 245-246 in processFile
+      const files = filterScanDirSync({
+        cwd: "test/fixture-symlink",
+        includeDir: false, // Don't include directories
+        // includeSymlink is not set (defaults to false/undefined)
+      });
+
+      // Should include regular files but not symlinks to directories
+      expect(files).toContain("regular.txt");
+      expect(files).toContain("subdir/file.js");
+      expect(files).not.toContain("link-to-dir"); // symlink to directory should be excluded
+      expect(files).not.toContain("link-to-file.txt"); // symlink to file should also be excluded when includeSymlink is not true
+    });
+
+    it("should include symlinks when includeSymlink is true", () => {
+      const files = filterScanDirSync({
+        cwd: "test/fixture-symlink",
+        includeDir: false,
+        includeSymlink: true, // Explicitly include symlinks
+      });
+
+      // Should include regular files and symlinks to files
+      expect(files).toContain("regular.txt");
+      expect(files).toContain("subdir/file.js");
+      expect(files).toContain("link-to-file.txt"); // symlink to file should be included
+      // Note: link-to-dir is still excluded because includeDir is false
+    });
+
+    it("should handle symlinks with async version", async () => {
+      const files = await filterScanDir({
+        cwd: "test/fixture-symlink",
+        includeDir: false,
+        includeSymlink: false, // Explicitly set to false
+      });
+
+      // Should include only regular files
+      expect(files).toContain("regular.txt");
+      expect(files).toContain("subdir/file.js");
+      expect(files).not.toContain("link-to-dir");
+      expect(files).not.toContain("link-to-file.txt");
+    });
+
+    it("should include symlink to directory when includeDir is true", () => {
+      const files = filterScanDirSync({
+        cwd: "test/fixture-symlink",
+        includeDir: true, // Include directories
+        includeSymlink: true, // Include symlinks
+      });
+
+      // Should include everything
+      expect(files).toContain("regular.txt");
+      expect(files).toContain("subdir");
+      expect(files).toContain("subdir/file.js");
+      expect(files).toContain("link-to-dir"); // symlink to directory included
+      expect(files).toContain("link-to-file.txt"); // symlink to file included
     });
   });
 });

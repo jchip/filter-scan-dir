@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dist-esm",
     "lib": [
-      "es2018"
+      "ES2018"
     ],
-    "module": "CommonJS",
+    "module": "ES2015",
     "esModuleInterop": true,
     "importHelpers": false,
     "target": "ES2018",
@@ -12,16 +12,14 @@
     "sourceMap": true,
     "declaration": true,
     "types": [
-      "node",
-      "mocha",
-      "chai",
-      "sinon",
-      "sinon-chai"
+      "node"
     ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "alwaysStrict": true,
-    "strictFunctionTypes": true
+    "strictFunctionTypes": true,
+    "moduleResolution": "Node",
+    "rewriteRelativeImportExtensions": true
   },
   "include": [
     "src"

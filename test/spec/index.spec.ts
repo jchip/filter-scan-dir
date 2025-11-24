@@ -1,28 +1,21 @@
 "use strict";
 
-import { expect } from "chai";
-import fsd from "../..";
-import { filterScanDir, filterScanDirSync } from "../..";
+import { describe, it, expect } from "vitest";
+import { filterScanDir, filterScanDirSync } from "../../src/index.ts";
 
-describe("commonjs export", function () {
+describe("exports", function () {
   it("should have proper exports", async () => {
-    expect(fsd).to.be.a("function");
-    expect(fsd.sync).to.be.a("function");
-    expect(fsd.filterScanDir).to.be.a("function");
-    expect(fsd.filterScanDirSync).to.be.a("function");
-    expect(filterScanDir).to.be.a("function");
-    expect(filterScanDirSync).to.be.a("function");
-    expect(fsd.filterScanDir).to.equal(filterScanDir);
-    expect(fsd.filterScanDirSync).to.equal(filterScanDirSync);
+    expect(typeof filterScanDir).toBe("function");
+    expect(typeof filterScanDirSync).toBe("function");
   });
 
   it("should scan files", async () => {
-    const files = await fsd("test/fixture-2");
-    expect(files).to.deep.equal(["bar.js", "blah.txt", "foo.js"]);
+    const files = await filterScanDir("test/fixture-2");
+    expect(files).toEqual(["bar.js", "blah.txt", "foo.js"]);
   });
 
   it("should scan files with sync api", async () => {
-    const sfiles = fsd.sync("test/fixture-2");
-    expect(sfiles).to.deep.equal(["bar.js", "blah.txt", "foo.js"]);
+    const sfiles = filterScanDirSync("test/fixture-2");
+    expect(sfiles).toEqual(["bar.js", "blah.txt", "foo.js"]);
   });
 });

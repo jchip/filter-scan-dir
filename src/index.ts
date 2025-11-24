@@ -3,7 +3,7 @@
 import Fs, { Dirent, Stats } from "fs";
 import Path from "path";
 import Util from "util";
-import { direntCmp, makePathJoin2 } from "./util";
+import { direntCmp, makePathJoin2 } from "./util.ts";
 
 /**
  * type of the 3rd argument for the filter callback
@@ -79,6 +79,8 @@ export type Options = {
   sortFiles?: boolean;
   /** include directories in result */
   includeDir?: boolean;
+  /** include symlinks in result (when includeDir is false, symlinks to directories are excluded unless this is true) */
+  includeSymlink?: boolean;
   /** zero base max level of directories to recurse into. Default: `Infinity`  */
   maxLevel?: number;
   /**
@@ -154,7 +156,7 @@ function makeExtrasData(
   path: string,
   stat: Dirent | Stats,
   files: (string | Dirent)[],
-  options: InternalOpts
+  options: InternalOpts,
 ): ExtrasData {
   const dirFile: string = options._join2(path, file);
   const ix = file.lastIndexOf(".");
@@ -236,6 +238,18 @@ function processDir(options, extras) {
  * @returns
  */
 function processFile(options, extras) {
+  // If includeDir is false and includeSymlink is not true, skip symlinks
+  // This prevents symlinks to directories from being included as files
+  if (
+    !options.includeDir &&
+    !options.includeSymlink &&
+    extras.stat &&
+    extras.stat.isSymbolicLink &&
+    extras.stat.isSymbolicLink()
+  ) {
+    return false;
+  }
+
   if (options.ignoreExt.length > 0 && options.ignoreExt.indexOf(extras.ext) >= 0) {
     return false;
   }
@@ -317,7 +331,7 @@ function walkSync(path: string, options: InternalOpts, level = 0) {
           path,
           file as Dirent,
           files,
-          options
+          options,
         );
       }
 
@@ -394,7 +408,7 @@ async function walk(path: string, options: InternalOpts, level = 0) {
           path,
           file as Dirent,
           files,
-          options
+          options,
         );
       }
 
@@ -508,7 +522,7 @@ function makeOptions(opts: string | Options): InternalOpts {
         .map(cleanExt)
         .filter((x) => x),
       _concurrentCount: 0,
-    }
+    },
   );
 
   opts2._join2 = makePathJoin2(sep, opts2.dir, opts2.prefix);
