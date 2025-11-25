@@ -1,6 +1,6 @@
 import Path from "path";
 import { describe, it, expect } from "vitest";
-import { direntCmp, makePathJoin2 } from "../../src/util.ts";
+import { direntCmp, join2 } from "../../src/util.ts";
 
 describe("dirent-cmp", function () {
   it("should compare elements", () => {
@@ -10,25 +10,25 @@ describe("dirent-cmp", function () {
   });
 });
 
-describe("path join2", function () {
-  it("should behave like path.join", () => {
-    const join2 = makePathJoin2(Path.sep, "", "");
-    expect(join2()).toBe(Path.join());
-    expect(join2("")).toBe(Path.join(""));
-    expect(join2(".")).toBe(Path.join("."));
-    expect(join2("..")).toBe(Path.join(".."));
-    expect(join2("x")).toBe(Path.join("x"));
-    expect(join2(".", ".")).toBe(Path.join(".", "."));
-    expect(join2("", ".")).toBe(Path.join("", "."));
-    expect(join2("..", ".")).toBe(Path.join("..", "."));
-    expect(join2(".", "..")).toBe(Path.join(".", ".."));
-    expect(join2("x", "y")).toBe(Path.join("x", "y"));
+describe("join2", function () {
+  it("should join simple paths", () => {
+    expect(join2(Path.sep, "x", "y")).toBe(Path.join("x", "y"));
+    expect(join2("/", "a/b", "c")).toBe("a/b/c");
+    expect(join2("\\", "a\\b", "c")).toBe("a\\b\\c");
   });
 
-  it("should use path.join for special cwd or prefix", () => {
-    expect(makePathJoin2(Path.sep, "./", "")).toBe(Path.join);
-    expect(makePathJoin2(Path.sep, "", "./")).toBe(Path.join);
-    expect(makePathJoin2(Path.sep, "../", "./")).toBe(Path.join);
-    expect(makePathJoin2(Path.sep, "./", "../")).toBe(Path.join);
+  it("should handle edge cases", () => {
+    expect(join2("/", "", "x")).toBe("x");
+    expect(join2("/", "x", "")).toBe("x");
+    expect(join2("/", ".", "x")).toBe("x");
+    expect(join2("/", "x", ".")).toBe("x");
+    expect(join2("/")).toBe(".");
+    expect(join2("/", "")).toBe(".");
+    expect(join2("/", ".")).toBe(".");
+  });
+
+  it("should handle normalized paths", () => {
+    expect(join2("/", "/absolute/path", "file.txt")).toBe("/absolute/path/file.txt");
+    expect(join2("/", "relative/path", "file.txt")).toBe("relative/path/file.txt");
   });
 });

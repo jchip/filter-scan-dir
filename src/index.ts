@@ -3,7 +3,7 @@
 import Fs, { Dirent, Stats } from "fs";
 import Path from "path";
 import Util from "util";
-import { direntCmp, makePathJoin2 } from "./util.ts";
+import { direntCmp, join2 } from "./util.ts";
 
 /**
  * type of the 3rd argument for the filter callback
@@ -133,8 +133,8 @@ export type GroupingOptions = {
 /** internal options and data */
 type InternalOpts = GroupingOptions & {
   _concurrentCount?: number;
-  /** join two paths together */
-  _join2: (a: string, b: string) => string;
+  /** path separator to use for joining paths */
+  _sep: string;
   result: Record<string, string[]>;
   readdirOpts: any;
   dir: string;
@@ -158,7 +158,7 @@ function makeExtrasData(
   files: (string | Dirent)[],
   options: InternalOpts,
 ): ExtrasData {
-  const dirFile: string = options._join2(path, file);
+  const dirFile: string = join2(options._sep, path, file);
   const ix = file.lastIndexOf(".");
 
   if (ix > 0) {
@@ -300,7 +300,8 @@ function getResult(options: InternalOpts): GroupingResult | string[] {
  */
 function walkSync(path: string, options: InternalOpts, level = 0) {
   try {
-    const dir = options._join2(options.dir, path);
+    // Use Path.join to normalize the directory path once at entry
+    const dir = Path.join(options.dir, path);
     let files: (string | Dirent)[] = Fs.readdirSync(dir, options.readdirOpts);
 
     if (options.sortFiles) {
@@ -320,11 +321,11 @@ function walkSync(path: string, options: InternalOpts, level = 0) {
       let extras: ExtrasData;
 
       if (options.fullStat) {
-        const fullFile = options._join2(dir, file as string);
+        const fullFile = join2(options._sep, dir, file as string);
         const stat = Fs.lstatSync(fullFile);
         extras = makeExtrasData(file as string, fullFile, path, stat, files, options);
       } else {
-        const fullFile = options._join2(dir, (file as Dirent).name);
+        const fullFile = join2(options._sep, dir, (file as Dirent).name);
         extras = makeExtrasData(
           (file as Dirent).name,
           fullFile,
@@ -377,7 +378,8 @@ const asyncLStat = Util.promisify(Fs.lstat);
  */
 async function walk(path: string, options: InternalOpts, level = 0) {
   try {
-    const dir = options._join2(options.dir, path);
+    // Use Path.join to normalize the directory path once at entry
+    const dir = Path.join(options.dir, path);
     let files: (string | Dirent)[] = await asyncReaddir(dir, options.readdirOpts);
 
     if (options.sortFiles) {
@@ -397,11 +399,11 @@ async function walk(path: string, options: InternalOpts, level = 0) {
       let extras;
 
       if (options.fullStat) {
-        const fullFile = options._join2(dir, file as string);
+        const fullFile = join2(options._sep, dir, file as string);
         const stat = await asyncLStat(fullFile);
         extras = makeExtrasData(file as string, fullFile, path, stat, files, options);
       } else {
-        const fullFile = options._join2(dir, (file as Dirent).name);
+        const fullFile = join2(options._sep, dir, (file as Dirent).name);
         extras = makeExtrasData(
           (file as Dirent).name,
           fullFile,
@@ -500,7 +502,7 @@ function makeOptions(opts: string | Options): InternalOpts {
 
   const opts2: InternalOpts = Object.assign(
     {
-      _join2: undefined,
+      _sep: sep,
       maxLevel: Infinity,
       prefix: "",
       prependCwd,
@@ -524,8 +526,6 @@ function makeOptions(opts: string | Options): InternalOpts {
       _concurrentCount: 0,
     },
   );
-
-  opts2._join2 = makePathJoin2(sep, opts2.dir, opts2.prefix);
 
   if (!opts2.fullStat) {
     opts2.readdirOpts = { withFileTypes: true };

@@ -23,28 +23,20 @@ export const direntCmp = (a: Dirent, b: Dirent): number => {
 };
 
 /**
- * Make a specialized and simple but faster version of path.join that handles just 2 args
+ * Simple and fast path join for 2 arguments.
+ * Assumes first argument is already normalized and second is a simple filename.
+ *
+ * @param sep - path separator to use
+ * @param a - base path (should be normalized)
+ * @param b - path component to append (typically a filename)
+ * @returns joined path
  */
-export const makePathJoin2 = (sep: string, cwd: string, prefix: string) => {
-  // user passed cwd or prefix that contains ../ or ..\\, which only path.join
-  // can handle
-  if (
-    ["../", "..\\"].find((s) => cwd.includes(s) || prefix.includes(s)) ||
-    (cwd.startsWith(".") && cwd.length > 1) ||
-    (prefix.startsWith(".") && prefix.length > 1)
-  ) {
-    return Path.join;
+export const join2 = (sep: string, a?: string, b?: string): string => {
+  if (!a || a === ".") {
+    return b || a || ".";
+  } else if (!b || b === ".") {
+    return a;
+  } else {
+    return a + sep + b;
   }
-
-  return (a?: string, b?: string) => {
-    if (a === ".") {
-      return b || a;
-    } else if (b === ".") {
-      return a || b;
-    } else if (a && b) {
-      return a + sep + b;
-    } else {
-      return a || b || ".";
-    }
-  };
 };
